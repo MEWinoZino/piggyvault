@@ -7,7 +7,7 @@ const DEFAULT_DATABASE = {
   activeKid: 'linheng',
   parentPin: '1349',
   timeWarpActive: false,
-  balanceVersion: 10,
+  balanceVersion: 11,
   profiles: {
     linheng: {
       name: 'Linheng',
@@ -20,6 +20,7 @@ const DEFAULT_DATABASE = {
       goals: [], // Clear all wishlist items
       chores: [], // Clean slate quest board
       lastAllowanceDate: "2026-05-25T12:00:00Z",
+      lastInterestDate: null,
       transactions: [
         { id: 101, type: "deposit", amount: 684.00, desc: "Pocket savings foundation", date: "2026-05-25T12:00:00Z" }
       ]
@@ -35,6 +36,7 @@ const DEFAULT_DATABASE = {
       goals: [], // Clear all wishlist items
       chores: [], // Clean slate quest board
       lastAllowanceDate: "2026-05-25T12:00:00Z",
+      lastInterestDate: null,
       transactions: [
         { id: 201, type: "deposit", amount: 702.86, desc: "Pocket savings foundation", date: "2026-05-25T12:00:00Z" }
       ]
@@ -83,11 +85,15 @@ document.addEventListener("DOMContentLoaded", () => {
     rewardInput.addEventListener("input", clearActiveChips);
   }
 
-  // Check date and deposit daily allowance retrospectively on boot
+  // Check date and deposit daily allowance and interest retrospectively on boot
   checkAndDepositAllowance();
+  checkAndDepositDailyInterest();
 
-  // Periodically check every 60 seconds (for midnight rollover support)
-  setInterval(checkAndDepositAllowance, 60000);
+  // Periodically check every 60 seconds (for midnight allowance and 6 PM interest rollover support)
+  setInterval(() => {
+    checkAndDepositAllowance();
+    checkAndDepositDailyInterest();
+  }, 60000);
 });
 
 // Load database from localStorage or seed default
@@ -105,9 +111,19 @@ function initDatabase() {
         throw new Error("Invalid structure");
       }
       
-      // Force database reset to version 10: clears test entries, resets balances to initial pockets
-      if (db.balanceVersion !== 10) {
-        db.balanceVersion = 10;
+      // Force database reset to version 11: clears test entries, resets balances to initial pockets, and sets up 6 PM daily interest tracking
+      if (db.balanceVersion !== 11) {
+        db.balanceVersion = 11;
+        
+        const now = new Date();
+        let initialLastInterest = new Date(now);
+        initialLastInterest.setHours(18, 0, 0, 0); // 6:00 PM
+        if (initialLastInterest.getTime() > now.getTime()) {
+          // 6 PM today is in the future, so seed to 6 PM yesterday
+          initialLastInterest.setTime(initialLastInterest.getTime() - 24 * 60 * 60 * 1000);
+        }
+        const initialInterestDateStr = initialLastInterest.toISOString();
+
         db.profiles.linheng.balance = 684.00;
         db.profiles.linheng.avatar = '🐷';
         db.profiles.linheng.interestRate = 5;
@@ -116,6 +132,7 @@ function initDatabase() {
         db.profiles.linheng.goals = [];
         db.profiles.linheng.chores = [];
         db.profiles.linheng.lastAllowanceDate = new Date().toISOString();
+        db.profiles.linheng.lastInterestDate = initialInterestDateStr;
         db.profiles.linheng.transactions = [
           { id: 101, type: "deposit", amount: 684.00, desc: "Pocket savings foundation", date: "2026-05-25T12:00:00Z" }
         ];
@@ -128,6 +145,7 @@ function initDatabase() {
         db.profiles.yitong.goals = [];
         db.profiles.yitong.chores = [];
         db.profiles.yitong.lastAllowanceDate = new Date().toISOString();
+        db.profiles.yitong.lastInterestDate = initialInterestDateStr;
         db.profiles.yitong.transactions = [
           { id: 201, type: "deposit", amount: 702.86, desc: "Pocket savings foundation", date: "2026-05-25T12:00:00Z" }
         ];
@@ -1414,41 +1432,86 @@ function renderKidGrowthChart() {
 
 // 1. Core Background Interest Tick (accrues true fractions silently)
 function startRealTimeInterest() {
-  if (realTimeInterestInterval) clearInterval(realTimeInterestInterval);
+  // Replaced by 6:00 PM Pacific Time Daily Interest compounding
+}
 
-  // Every 5 seconds, add micro interest accruals
-  realTimeInterestInterval = setInterval(() => {
-    // Only tick true interest if TIME WARP is not active (to prevent double compounding)
-    if (db.timeWarpActive) return;
-
-    let databaseChanged = false;
-
-    ['linheng', 'yitong'].forEach(kidId => {
-      const profile = db.profiles[kidId];
-      if (profile.balance <= 0 || profile.interestRate <= 0) return;
-
-      // True APR fraction: 5 seconds out of 1 Year (31,536,000 seconds)
-      const fractionalRate = (profile.interestRate / 100) * (5 / 31536000);
-      const earned = profile.balance * fractionalRate;
-      
-      // Store exact floating decimals
-      profile.balance = parseFloat((profile.balance + earned).toFixed(6));
-      profile.totalInterest = parseFloat((profile.totalInterest + earned).toFixed(6));
-      
-      databaseChanged = true;
-    });
-
-    if (databaseChanged) {
-      // In JS we fix standard views to two decimal places
-      saveDatabase();
-      
-      // Silently refresh values if in kid mode, without wiggling
-      const activeProfile = db.profiles[db.activeKid];
-      document.getElementById("currentBalanceDisplay").innerText = formatCurrency(activeProfile.balance);
-      document.getElementById("totalInterestDisplay").innerText = `+${formatCurrency(activeProfile.totalInterest)}`;
-      updateFamilyTotalDisplay();
+// Check date and deposit daily compounding interest retrospectively (6:00 PM local device time)
+function checkAndDepositDailyInterest() {
+  if (db.timeWarpActive) return; // Prevent double compounding during simulated Time-Warp Mode
+  
+  let dbChanged = false;
+  const now = new Date();
+  
+  ['linheng', 'yitong'].forEach(kidId => {
+    const profile = db.profiles[kidId];
+    if (profile.balance <= 0 || profile.interestRate <= 0) return;
+    
+    // Seed lastInterestDate if missing
+    if (!profile.lastInterestDate) {
+      let initialLastInterest = new Date(now);
+      initialLastInterest.setHours(18, 0, 0, 0); // 6:00 PM
+      if (initialLastInterest.getTime() > now.getTime()) {
+        initialLastInterest.setTime(initialLastInterest.getTime() - 24 * 60 * 60 * 1000);
+      }
+      profile.lastInterestDate = initialLastInterest.toISOString();
+      dbChanged = true;
+      return;
     }
-  }, 5000);
+    
+    let tempDate = new Date(profile.lastInterestDate);
+    // Reset exact hours to 18:00 (6 PM) to ensure rollover precision
+    tempDate.setHours(18, 0, 0, 0);
+    
+    let rolloverCount = 0;
+    let compoundingBalance = profile.balance;
+    let accumulatedInterest = 0;
+    
+    while (true) {
+      // Advance by 1 day
+      let next6PM = new Date(tempDate.getTime() + 24 * 60 * 60 * 1000);
+      next6PM.setHours(18, 0, 0, 0);
+      
+      if (next6PM.getTime() <= now.getTime()) {
+        const dailyRate = (profile.interestRate / 100) / 365;
+        const earned = compoundingBalance * dailyRate;
+        compoundingBalance += earned;
+        accumulatedInterest += earned;
+        rolloverCount++;
+        tempDate = next6PM;
+      } else {
+        break;
+      }
+    }
+    
+    if (rolloverCount > 0) {
+      profile.balance = parseFloat(compoundingBalance.toFixed(2));
+      profile.totalInterest = parseFloat((profile.totalInterest + accumulatedInterest).toFixed(2));
+      profile.lastInterestDate = tempDate.toISOString();
+      
+      // Log consolidated deposit transaction in ledger history
+      profile.transactions.push({
+        id: Date.now() + (kidId === 'yitong' ? 99 : 0),
+        type: "deposit",
+        amount: parseFloat(accumulatedInterest.toFixed(2)),
+        desc: `Daily Interest (${rolloverCount} day${rolloverCount > 1 ? 's' : ''} at ${profile.interestRate}% APR)`,
+        date: now.toISOString()
+      });
+      
+      dbChanged = true;
+      
+      // Visual notification toast in kid mode for the currently active kid
+      if (db.activeKid === kidId) {
+        setTimeout(() => {
+          showToast("Interest Credited!", `Earned +${formatCurrency(accumulatedInterest)} daily interest!`, "success");
+        }, 1500);
+      }
+    }
+  });
+  
+  if (dbChanged) {
+    saveDatabase();
+    renderApp();
+  }
 }
 
 // Check date and deposit daily allowance retrospectively
