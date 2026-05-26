@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PiggyVault - Kids Savings Dashboard</title>
+  
+  <!-- Google Fonts for Friendly and Modern look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for Premium Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js for High-Fidelity Interest Growth Predictions -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Dynamic Backdrop Floating Shapes -->
+  <div class="blob-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- HEADER SECTION -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i class="fa-solid fa-piggy-bank"></i>
+        </div>
+        <div>
+          <h1>PiggyVault</h1>
+          <p class="tagline">Fun Savings & Finance for Kids!</p>
+        </div>
+      </div>
+
+      <!-- Profile Selector Header Controls -->
+      <div class="header-controls">
+        <div class="profile-tabs" id="profileTabs">
+          <button class="profile-tab active" data-kid="linheng" onclick="switchKidProfile('linheng')">
+            <div class="avatar avatar-linheng">🐷</div>
+            <span>Linheng</span>
+          </button>
+          <button class="profile-tab" data-kid="yitong" onclick="switchKidProfile('yitong')">
+            <div class="avatar avatar-yitong">😈</div>
+            <span>Yitong</span>
+          </button>
+        </div>
+
+        <button class="parent-gate-btn" onclick="openParentModal()">
+          <i class="fa-solid fa-user-shield"></i>
+          <span>Parent Portal</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN DASHBOARD WRAPPER -->
+    <main class="dashboard-grid" id="kidView">
+      
+      <!-- COLUMN 1: PIGGY BANK & ACCUMULATION STATS -->
+      <section class="dash-card piggy-card card-glow">
+        <div class="card-header-kid">
+          <h2 class="fredoka-font">My Piggy Bank</h2>
+          <span class="active-badge" id="kidNameBadge">Linheng's Vault</span>
+        </div>
+
+        <!-- Animated Piggy SVG Area -->
+        <div class="piggy-wrapper" id="piggyClickTarget" onclick="triggerPiggyWiggle()">
+          <div class="coin-stream" id="coinStream"></div>
+          <!-- Cute SVG Piggy Bank -->
+          <svg class="piggy-svg" viewBox="0 0 200 160" width="100%" height="220px">
+            <!-- Feet -->
+            <rect x="60" y="125" width="20" height="25" rx="6" fill="#f48fb1" />
+            <rect x="120" y="125" width="20" height="25" rx="6" fill="#f48fb1" />
+            <rect x="75" y="128" width="20" height="22" rx="6" fill="#ec4899" />
+            <rect x="105" y="128" width="20" height="22" rx="6" fill="#ec4899" />
+            <!-- Tail -->
+            <path d="M 40,80 Q 25,65 30,55 T 42,62" fill="none" stroke="#ec4899" stroke-width="4" stroke-linecap="round" />
+            <!-- Body -->
+            <ellipse cx="100" cy="85" rx="60" ry="50" fill="#f48fb1" class="piggy-body-main" />
+            <path d="M 50,55 A 50,45 0 0,0 150,55 Z" fill="#f8bbd0" opacity="0.3" />
+            <!-- Ear Back -->
+            <polygon points="65,45 50,15 80,32" fill="#ec4899" />
+            <!-- Ear Front -->
+            <polygon points="120,40 145,10 135,35" fill="#f48fb1" />
+            <!-- Eyes -->
+            <circle cx="140" cy="72" r="5" fill="#2d3748" />
+            <circle cx="142" cy="70" r="1.5" fill="#ffffff" />
+            <!-- Snout -->
+            <path d="M 155,75 A 15,20 0 0,1 170,95 Q 165,100 155,95 Z" fill="#ec4899" />
+            <ellipse cx="163" cy="83" rx="2.5" ry="4" fill="#880e4f" />
+            <ellipse cx="167" cy="87" rx="2" ry="3" fill="#880e4f" />
+            <!-- Coin Slot -->
+            <rect x="85" y="30" width="30" height="6" rx="3" fill="#880e4f" />
+            <!-- Liquid Progress Mask Cover (Visual balance tracking) -->
+            <ellipse cx="100" cy="85" rx="55" ry="45" fill="#4ade80" class="piggy-fill" id="piggyVisualFill" opacity="0.3" />
+          </svg>
+          <div class="piggy-speech-bubble" id="speechBubble">
+            Clink! Click me to drop a coin!
+          </div>
+        </div>
+
+        <!-- High-Fidelity Balance Display -->
+        <div class="balance-display">
+          <div class="bal-label">CURRENT SAVINGS</div>
+          <div class="bal-value" id="currentBalanceDisplay">$0.00</div>
+          
+          <div class="interest-rate-chip" id="interestChip">
+            <i class="fa-solid fa-chart-line"></i> Earning <span id="currentRateDisplay">6%</span> Interest
+          </div>
+        </div>
+
+        <!-- Mini Stats Summary -->
+        <div class="mini-stats-grid">
+          <div class="m-stat">
+            <span class="m-label">Total Earned Interest</span>
+            <span class="m-val text-green" id="totalInterestDisplay">+$0.00</span>
+          </div>
+          <div class="m-stat">
+            <span class="m-label">Completed Quests</span>
+            <span class="m-val text-blue" id="completedQuestsDisplay">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUMN 2: WISHLIST SAVING GOALS -->
+      <section class="dash-card card-glow flex-column">
+        <div class="card-header-kid">
+          <h2 class="fredoka-font"><i class="fa-solid fa-wand-magic-sparkles text-pink"></i> My Wishlist Goals</h2>
+          <button class="action-btn-sm" onclick="showAddGoalModal()">
+            <i class="fa-solid fa-plus"></i> Add Goal
+          </button>
+        </div>
+
+        <p class="section-desc">What are you saving up for? Set your goals here and watch your money get closer!</p>
+        
+        <!-- Active Goals Scrollable List -->
+        <div class="scroll-list" id="goalsList">
+          <!-- Dynamically Injected Goals -->
+        </div>
+      </section>
+
+      <!-- COLUMN 3: QUEST BOARD (CHORES) & RECENT TRANSACTIONS -->
+      <section class="dash-card card-glow flex-column">
+        <!-- TABS FOR CHORES & HISTORY -->
+        <div class="tab-header">
+          <button class="tab-btn active" id="questsTabBtn" onclick="switchRightTab('quests')">
+            <i class="fa-solid fa-gamepad"></i> Quest Board
+          </button>
+          <button class="tab-btn" id="historyTabBtn" onclick="switchRightTab('history')">
+            <i class="fa-solid fa-receipt"></i> Vault History
+          </button>
+          <button class="tab-btn" id="growthTabBtn" onclick="switchRightTab('growth')">
+            <i class="fa-solid fa-chart-line"></i> Money Growth
+          </button>
+        </div>
+
+        <!-- TAB CONTENT 1: QUEST BOARD -->
+        <div class="tab-content active" id="questsTabContent">
+          <div class="quests-intro-row">
+            <p class="section-desc">Complete chores to earn coins, or suggest your own tasks to Mom and Dad!</p>
+            <button class="action-btn-sm" onclick="showProposeChoreModal()">
+              <i class="fa-solid fa-lightbulb"></i> Propose Quest
+            </button>
+          </div>
+          <div class="chore-quest-list" id="choresList">
+            <!-- Dynamically Injected Chores -->
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 2: TRANSACTION HISTORY -->
+        <div class="tab-content" id="historyTabContent">
+          <p class="section-desc">Keep track of every single coin moving in or out of your PiggyVault.</p>
+          <div class="transaction-history" id="transactionList">
+            <!-- Dynamically Injected Transactions -->
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 3: MONEY GROWTH SIMULATOR -->
+        <div class="tab-content" id="growthTabContent">
+          <p class="section-desc">See how fast your savings will compound over 10 years at your current interest rate!</p>
+          
+          <!-- Daily Interest Calculator Board -->
+          <div class="daily-earnings-card">
+            <div class="dec-left">
+              <span class="dec-title"><i class="fa-solid fa-clock-rotate-left"></i> Expected Daily Growth</span>
+              <span class="dec-desc">This is how much your vault grows every single day just by keeping your coins saved!</span>
+            </div>
+            <div class="dec-right" id="dailyGrowthDisplay">+$0.11 / day</div>
+          </div>
+
+          <div class="graph-area flex-1" style="height: 220px; background: rgba(0, 0, 0, 0.15); margin-top: 6px;">
+            <div class="chart-container">
+              <canvas id="growthChartKid"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==================== PARENT PORTAL VIEW (HIDDEN BY DEFAULT) ==================== -->
+    <section class="parent-portal-view hidden" id="parentView">
+      
+      <!-- Parent Header Panel -->
+      <div class="parent-header-card">
+        <div class="ph-left">
+          <div class="parent-badge"><i class="fa-solid fa-user-shield"></i> Parent Portal</div>
+          <h2>Control Room</h2>
+          <p>Admin tools, interest rates, ledger adjustments, and chore approvals</p>
+        </div>
+        <div class="ph-right">
+          <div class="family-stat-card">
+            <span>FAMILY TOTAL SAVED</span>
+            <strong id="familyTotalDisplay">$0.00</strong>
+          </div>
+          <button class="exit-parent-btn" onclick="exitParentPortal()">
+            <i class="fa-solid fa-door-open"></i> Back to Kids Mode
+          </button>
+        </div>
+      </div>
+
+      <div class="parent-grid">
+        
+        <!-- PARENT COL 1: SETTINGS & ADJUSTMENTS -->
+        <div class="p-card flex-column">
+          <div class="p-card-header">
+            <h3><i class="fa-solid fa-cash-register"></i> Fast Ledger Adjustments</h3>
+          </div>
+
+          <!-- Select active kid to edit -->
+          <div class="form-group">
+            <label for="parentKidSelector">Choose Kid Account:</label>
+            <select id="parentKidSelector" class="parent-select" onchange="parentSelectKidChange()">
+              <option value="linheng">🐷 Linheng's Vault</option>
+              <option value="yitong">😈 Yitong's Vault</option>
+            </select>
+          </div>
+
+          <div class="quick-bal-editor">
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="adjustmentAmount">Amount ($)</label>
+                <input type="number" id="adjustmentAmount" class="parent-input" placeholder="10.00" min="0.01" step="0.01">
+              </div>
+              <div class="form-group flex-2">
+                <label for="adjustmentNote">Note / Description</label>
+                <input type="text" id="adjustmentNote" class="parent-input" placeholder="e.g. Weekly allowance, Birthday bonus">
+              </div>
+            </div>
+            
+            <div class="adjustment-buttons">
+              <button class="p-btn p-btn-deposit" onclick="executeManualLedger('deposit')">
+                <i class="fa-solid fa-plus-circle"></i> Add Funds (Deposit)
+              </button>
+              <button class="p-btn p-btn-withdraw" onclick="executeManualLedger('withdraw')">
+                <i class="fa-solid fa-minus-circle"></i> Deduct Funds (Withdraw)
+              </button>
+            </div>
+          </div>
+
+          <!-- Sibling Fund Transfer section -->
+          <div class="sibling-transfer-area">
+            <div class="p-card-header" style="padding-top: 15px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+              <h4><i class="fa-solid fa-right-left"></i> Sibling Coin Transfer</h4>
+            </div>
+            <p class="section-desc" style="font-size: 11px;">Move savings directly from one child to another.</p>
+            <div class="form-row" style="margin-top: 10px;">
+              <div class="form-group flex-1">
+                <label for="transferSender">Sender</label>
+                <select id="transferSender" class="parent-select" onchange="adjustTransferRecipients('sender')">
+                  <option value="linheng">Linheng</option>
+                  <option value="yitong">Yitong</option>
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label for="transferReceiver">Receiver</label>
+                <select id="transferReceiver" class="parent-select" onchange="adjustTransferRecipients('receiver')">
+                  <option value="yitong">Yitong</option>
+                  <option value="linheng">Linheng</option>
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label for="transferAmount">Amount ($)</label>
+                <input type="number" id="transferAmount" class="parent-input" placeholder="5.00" min="0.01" step="0.01">
+              </div>
+            </div>
+            <button class="p-btn p-btn-transfer" onclick="executeSiblingTransfer()">
+              <i class="fa-solid fa-exchange"></i> Complete Transfer
+          </div>
+
+          <!-- Danger Zone Admin Controls -->
+          <div class="parent-admin-tools" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <h4 style="font-family: var(--font-kid); font-size: 13px; color: var(--color-pink); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h4>
+            <p class="section-desc" style="font-size: 11px; margin-top: 4px;">Reset profiles back to initial balances and wipe transaction histories.</p>
+            <button class="p-btn" onclick="confirmResetVault()" style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.25); color: var(--color-pink); width: 100%; margin-top: 8px; font-weight: 700; font-size: 11px;">
+              <i class="fa-solid fa-trash-can-arrow-up"></i> Reset Vault & History
+            </button>
+          </div>
+        </div>
+
+        <!-- PARENT COL 2: INTEREST SETTINGS & EDUCATIONAL SIMULATOR -->
+        <div class="p-card flex-column">
+          <div class="p-card-header">
+            <h3><i class="fa-solid fa-chart-pie"></i> Interest Controls</h3>
+          </div>
+
+          <!-- Live Interest Slider -->
+          <div class="interest-rate-panel">
+            <div class="slider-header">
+              <span>Annual Interest Rate (APR):</span>
+              <strong id="interestRateVal">6%</strong>
+            </div>
+            <input type="range" id="interestRateSlider" min="0" max="25" value="6" class="parent-slider" oninput="parentInterestSliderChange(this.value)">
+            <p class="slider-helper text-muted">A high interest rate teaches kids how compound interest pays them back over time for leaving their money in the vault.</p>
+          </div>
+
+          <!-- Dynamic Time Warp Simulator Control -->
+          <div class="time-warp-panel">
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <strong><i class="fa-solid fa-bolt text-yellow"></i> Interest Time-Warp Mode</strong>
+                <p>Educational mode: Ticking this speeds up time so interest compound deposits occur every 10 seconds! Watch compound interest grow in real-time.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="timeWarpToggle" onchange="toggleTimeWarp(this.checked)">
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="time-warp-alert hidden" id="timeWarpActiveIndicator">
+              <i class="fa-solid fa-atom fa-spin"></i> TIME-WARP RUNNING: 1 simulated banking year ticks by every 15 seconds!
+            </div>
+          </div>
+
+          <!-- Compound Simulator Visual Graph Card -->
+          <div class="graph-area flex-1">
+            <div class="graph-header">
+              <h4>10-Year Savings Forecast Chart</h4>
+              <span class="badge" id="chartForecastTarget">Linheng</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="growthChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- PARENT COL 3: CHORE APPROVALS & CREATION -->
+        <div class="p-card flex-column">
+          <div class="p-card-header">
+            <h3><i class="fa-solid fa-list-check"></i> Quest & Chore Approvals</h3>
+          </div>
+          
+          <p class="section-desc">Review and approve chores that the kids have marked as finished.</p>
+          
+          <!-- Scrollable chores approval queue -->
+          <div class="approval-scroll-list" id="parentApprovalsQueue">
+            <!-- Dynamically Injected Pending Chores -->
+            <div class="no-pending-chores">
+              <i class="fa-solid fa-face-smile"></i>
+              <p>No chores waiting for approval right now!</p>
+            </div>
+          </div>
+
+          <div class="chore-creator-box">
+            <div class="p-card-header" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+              <h4><i class="fa-solid fa-plus-square"></i> Assign a New Chore Quest</h4>
+            </div>
+            
+            <div class="form-group">
+              <label for="newChoreKid">Assign to:</label>
+              <select id="newChoreKid" class="parent-select">
+                <option value="both">All Kids (Linheng & Yitong)</option>
+                <option value="linheng">Linheng Only</option>
+                <option value="yitong">Yitong Only</option>
+              </select>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label for="newChoreName">Chore / Quest Name</label>
+                <input type="text" id="newChoreName" class="parent-input" placeholder="e.g. Clean the windows, Wash the car">
+              </div>
+              <div class="form-group flex-1">
+                <label for="newChoreReward">Reward ($)</label>
+                <input type="number" id="newChoreReward" class="parent-input" placeholder="5.00" min="0.10" step="0.10">
+              </div>
+            </div>
+            
+            <button class="p-btn p-btn-add-chore" onclick="parentCreateNewChore()">
+              <i class="fa-solid fa-paper-plane"></i> Launch Quest
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== DIALOGS & OVERLAYS ==================== -->
+
+  <!-- 1. PARENT ENTRY PASSCODE GATE MODAL -->
+  <div class="modal-overlay hidden" id="parentPinModal">
+    <div class="pin-card glassmorphism bounce-in">
+      <button class="close-modal-btn" onclick="closeParentModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+      
+      <div class="pin-header">
+        <i class="fa-solid fa-lock-open pin-icon"></i>
+        <h3>Unlock Parent Portal</h3>
+        <p>Enter the security code to view parent tools.</p>
+      </div>
+
+      <!-- PIN Display Visual -->
+      <div class="pin-display">
+        <div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div>
+        <div class="pin-dot" id="dot-3"></div>
+        <div class="pin-dot" id="dot-4"></div>
+      </div>
+      
+      <div class="pin-alert text-pink hidden" id="pinErrorAlert">
+        Oops! That's the wrong code. Try again! (Hint: Default is 1234)
+      </div>
+
+      <!-- Custom Touchpad Keypad Grid -->
+      <div class="pin-keypad">
+        <button class="key-btn" onclick="pressPinNumber('1')">1</button>
+        <button class="key-btn" onclick="pressPinNumber('2')">2</button>
+        <button class="key-btn" onclick="pressPinNumber('3')">3</button>
+        <button class="key-btn" onclick="pressPinNumber('4')">4</button>
+        <button class="key-btn" onclick="pressPinNumber('5')">5</button>
+        <button class="key-btn" onclick="pressPinNumber('6')">6</button>
+        <button class="key-btn" onclick="pressPinNumber('7')">7</button>
+        <button class="key-btn" onclick="pressPinNumber('8')">8</button>
+        <button class="key-btn" onclick="pressPinNumber('9')">9</button>
+        <button class="key-btn key-action text-pink" onclick="clearPinNumber()">CLR</button>
+        <button class="key-btn" onclick="pressPinNumber('0')">0</button>
+        <button class="key-btn key-action text-green" onclick="submitParentPin()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ADD WISHLIST GOAL MODAL -->
+  <div class="modal-overlay hidden" id="addGoalModal">
+    <div class="goal-card glassmorphism bounce-in">
+      <button class="close-modal-btn" onclick="closeAddGoalModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gift text-pink"></i> Add a Saving Goal</h3>
+        <p>Tell us what cool item you are saving your coins for!</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="newGoalName">Goal Title / Name</label>
+          <input type="text" id="newGoalName" class="parent-input" placeholder="e.g. Lego Star Wars Castle, Electric Scooter">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="newGoalCost">Target Cost ($)</label>
+            <input type="number" id="newGoalCost" class="parent-input" placeholder="45.00" min="1.00" step="0.01">
+          </div>
+          <div class="form-group flex-1">
+            <label for="newGoalCategory">Choose Icon / Type</label>
+            <select id="newGoalCategory" class="parent-select">
+              <option value="gamepad">🎮 Gaming / Console</option>
+              <option value="lego">🧩 Blocks / Toys</option>
+              <option value="bicycle">🚲 Outdoor / Sports</option>
+              <option value="music">🎵 Music / Audio</option>
+              <option value="book">📚 Book / Learning</option>
+              <option value="laptop">💻 Tech / Screen</option>
+              <option value="gift">🎁 Other Surprise</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="save-goal-btn" onclick="saveNewWishlistGoal()">
+          <i class="fa-solid fa-star"></i> Pin to My Goalboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. PROPOSE QUEST MODAL (KID MODE) -->
+  <div class="modal-overlay hidden" id="proposeChoreModal">
+    <div class="goal-card glassmorphism bounce-in">
+      <button class="close-modal-btn" onclick="closeProposeChoreModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-lightbulb text-yellow"></i> Propose a Quest</h3>
+        <p>Want to earn extra coins for a custom chore? Propose it to Mom and Dad!</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="proposal-suggestions-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Click a fun idea below to auto-fill, or type your own:</div>
+        
+        <div class="proposal-suggestions-grid">
+          <button class="suggestion-chip" type="button" onclick="selectProposalSuggestion('🍽️ Clean dinner table', 1.00, this)">
+            <span class="emoji">🍽️</span>
+            <div class="chip-info">
+              <span class="chip-name">Clean dinner table</span>
+              <span class="chip-reward">$1.00</span>
+            </div>
+          </button>
+          <button class="suggestion-chip" type="button" onclick="selectProposalSuggestion('🧺 Fold laundry', 1.00, this)">
+            <span class="emoji">🧺</span>
+            <div class="chip-info">
+              <span class="chip-name">Fold laundry</span>
+              <span class="chip-reward">$1.00</span>
+            </div>
+          </button>
+          <button class="suggestion-chip" type="button" onclick="selectProposalSuggestion('🪴 Help gardening (per 15 min)', 1.00, this)">
+            <span class="emoji">🪴</span>
+            <div class="chip-info">
+              <span class="chip-name">Help gardening</span>
+              <span class="chip-reward">$1.00 / 15m</span>
+            </div>
+          </button>
+          <button class="suggestion-chip" type="button" onclick="selectProposalSuggestion('🌟 Other helpful task', 0.00, this)">
+            <span class="emoji">🌟</span>
+            <div class="chip-info">
+              <span class="chip-name">Others</span>
+              <span class="chip-reward">Amount TBD</span>
+            </div>
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label for="proposedChoreName">Quest Description</label>
+          <input type="text" id="proposedChoreName" class="parent-input" placeholder="e.g. Wash the living room windows, Clean the garage">
+        </div>
+
+        <div class="form-group">
+          <label for="proposedChoreReward">Requested Reward ($)</label>
+          <input type="number" id="proposedChoreReward" class="parent-input" placeholder="3.00" min="0.10" step="0.10">
+        </div>
+
+        <button class="save-goal-btn" onclick="submitProposedChore()">
+          <i class="fa-solid fa-paper-plane"></i> Send to Parents
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Popup Bubble -->
+  <div class="toast-notification hidden" id="toastBox">
+    <div class="toast-icon" id="toastIcon"><i class="fa-solid fa-bell"></i></div>
+    <div class="toast-body">
+      <strong id="toastTitle">Notification</strong>
+      <span id="toastMsg">Action completed successfully!</span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
