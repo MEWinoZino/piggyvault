@@ -418,7 +418,7 @@ function renderQuestsList(profile) {
     } else if (chore.status === "pending_approval") {
       actionArea = `<span class="chore-status-pending"><i class="fa-solid fa-spinner fa-spin"></i> Reviewing</span>`;
     } else if (chore.status === "proposed") {
-      actionArea = `<span class="chore-status-proposed"><i class="fa-solid fa-lightbulb"></i> Proposed</span>`;
+      actionArea = `<span class="chore-status-proposed"><i class="fa-solid fa-clock"></i> Awaiting Payout</span>`;
     }
 
     item.innerHTML = `
@@ -1077,13 +1077,25 @@ function resolvePendingChore(kidId, itemId, isApproved, originalStatus) {
 
   if (originalStatus === "proposed") {
     if (isApproved) {
-      // Approve Chore definition suggestion: transform status from "proposed" to "active" so kid can now do it!
-      profile.chores[choreIndex].status = "active";
+      // Streamlined Quest Proposal: single approval pays out instantly and completes the quest!
+      profile.balance = parseFloat((profile.balance + rewardAmount).toFixed(2));
+      profile.completedQuests += 1;
+      profile.chores[choreIndex].status = "completed";
+
+      // Ledger Transaction record
+      profile.transactions.push({
+        id: Date.now(),
+        type: "deposit",
+        amount: rewardAmount,
+        desc: `Reward: Completed "${choreName}" (Proposed)`,
+        date: new Date().toISOString()
+      });
+
       saveDatabase();
       renderApp();
-      showToast("Quest Approved!", `Added "${choreName}" to ${profile.name}'s active Quest Board!`, "success");
+      showToast("Quest Payout Approved", `Quest "${choreName}" approved! Paid ${formatCurrency(rewardAmount)} to ${profile.name}!`, "success");
     } else {
-      // Reject Chore definition suggestion: delete it entirely from their list!
+      // Reject proposed quest: delete it entirely from their list!
       profile.chores = profile.chores.filter(c => c.id !== itemId);
       saveDatabase();
       renderApp();
