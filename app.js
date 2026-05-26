@@ -5,7 +5,7 @@
 // Database Structure holding global state and kid profiles
 const DEFAULT_DATABASE = {
   activeKid: 'linheng',
-  parentPin: '1234',
+  parentPin: '1349',
   timeWarpActive: false,
   balanceVersion: 10,
   profiles: {
@@ -96,6 +96,9 @@ function initDatabase() {
   if (localData) {
     try {
       db = JSON.parse(localData);
+      
+      // Force update stored parent PIN to new requested '1349'
+      db.parentPin = '1349';
       
       // Ensure safety check for profiles structure
       if (!db.profiles || !db.profiles.linheng || !db.profiles.yitong) {
