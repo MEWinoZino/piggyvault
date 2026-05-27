@@ -187,6 +187,17 @@ function renderApp() {
   // Update main stats elements
   document.getElementById("kidNameBadge").innerText = `${profile.name}'s Vault`;
   document.getElementById("currentBalanceDisplay").innerText = formatCurrency(profile.balance);
+  
+  // Calculate and show dynamic delta compared to initial pocket deposit since establishment
+  const balEstablishedNotice = document.getElementById("balEstablishedNotice");
+  if (balEstablishedNotice) {
+    const initialBalance = activeKid === 'linheng' ? 684.00 : 702.86;
+    const delta = profile.balance - initialBalance;
+    const sign = delta >= 0 ? "+" : "";
+    const colorClass = delta >= 0 ? "text-green" : "text-red";
+    balEstablishedNotice.innerHTML = `Established since 2026/05/25 · <span class="${colorClass}" style="font-weight: 700;">${sign}${formatCurrency(delta)}</span> since start`;
+  }
+
   document.getElementById("currentRateDisplay").innerText = `${profile.interestRate}%`;
   document.getElementById("totalInterestDisplay").innerText = `+${formatCurrency(profile.totalInterest)}`;
   document.getElementById("completedQuestsDisplay").innerText = profile.completedQuests;

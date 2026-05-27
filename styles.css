@@ -592,6 +592,7 @@ body {
 .text-blue { color: var(--color-blue); }
 .text-pink { color: var(--color-pink); }
 .text-yellow { color: var(--color-yellow); }
+.text-red { color: #f43f5e; }
 
 /* ==========================================
    SCROLLABLE WISHLIST GOALS LIST
