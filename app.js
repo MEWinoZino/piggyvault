@@ -1514,7 +1514,7 @@ function checkAndDepositDailyInterest() {
   }
 }
 
-// Check date and deposit daily allowance retrospectively
+// Check date and deposit daily allowance retrospectively (6:00 PM local device time)
 function checkAndDepositAllowance() {
   let dbChanged = false;
   const now = new Date();
@@ -1522,35 +1522,50 @@ function checkAndDepositAllowance() {
   ['linheng', 'yitong'].forEach(kidId => {
     const profile = db.profiles[kidId];
     
-    // Seed lastAllowanceDate if missing or invalid
+    // Seed lastAllowanceDate if missing
     if (!profile.lastAllowanceDate) {
-      profile.lastAllowanceDate = now.toISOString();
+      let initialLastAllowance = new Date(now);
+      initialLastAllowance.setHours(18, 0, 0, 0); // 6:00 PM
+      if (initialLastAllowance.getTime() > now.getTime()) {
+        initialLastAllowance.setTime(initialLastAllowance.getTime() - 24 * 60 * 60 * 1000);
+      }
+      profile.lastAllowanceDate = initialLastAllowance.toISOString();
       dbChanged = true;
       return;
     }
     
-    const lastDate = new Date(profile.lastAllowanceDate);
-    const diffMs = now.getTime() - lastDate.getTime();
+    let tempDate = new Date(profile.lastAllowanceDate);
+    // Reset exact hours to 18:00 (6 PM) to ensure rollover precision
+    tempDate.setHours(18, 0, 0, 0);
     
-    // Standard calendar day difference (24 hours)
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    let rolloverCount = 0;
     
-    if (diffDays > 0) {
-      const allowanceAmount = diffDays * 1.00;
-      profile.balance = parseFloat((profile.balance + allowanceAmount).toFixed(2));
+    while (true) {
+      // Advance by 1 day
+      let next6PM = new Date(tempDate.getTime() + 24 * 60 * 60 * 1000);
+      next6PM.setHours(18, 0, 0, 0);
       
-      // Log transaction
+      if (next6PM.getTime() <= now.getTime()) {
+        rolloverCount++;
+        tempDate = next6PM;
+      } else {
+        break;
+      }
+    }
+    
+    if (rolloverCount > 0) {
+      const allowanceAmount = rolloverCount * 1.00;
+      profile.balance = parseFloat((profile.balance + allowanceAmount).toFixed(2));
+      profile.lastAllowanceDate = tempDate.toISOString();
+      
+      // Log consolidated deposit transaction in ledger history
       profile.transactions.push({
         id: Date.now() + (kidId === 'yitong' ? 99 : 0),
         type: "deposit",
         amount: allowanceAmount,
-        desc: `Daily Allowance (${diffDays} day${diffDays > 1 ? 's' : ''})`,
+        desc: `Daily Allowance (${rolloverCount} day${rolloverCount > 1 ? 's' : ''})`,
         date: now.toISOString()
       });
-      
-      // Shift date precisely forward by diffDays to maintain precision
-      const updatedDate = new Date(lastDate.getTime() + diffDays * 24 * 60 * 60 * 1000);
-      profile.lastAllowanceDate = updatedDate.toISOString();
       
       dbChanged = true;
       
@@ -1558,7 +1573,7 @@ function checkAndDepositAllowance() {
       if (db.activeKid === kidId) {
         // Run after DOM has loaded to ensure toast box element exists
         setTimeout(() => {
-          showToast("Allowance Credited!", `Got +${formatCurrency(allowanceAmount)} allowance for ${diffDays} day${diffDays > 1 ? 's' : ''}!`, "success");
+          showToast("Allowance Credited!", `Got +${formatCurrency(allowanceAmount)} allowance for ${rolloverCount} day${rolloverCount > 1 ? 's' : ''}!`, "success");
         }, 1000);
       }
     }
