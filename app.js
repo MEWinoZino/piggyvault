@@ -11,7 +11,7 @@ const DEFAULT_DATABASE = {
   profiles: {
     linheng: {
       name: 'Linheng',
-      avatar: '🐷',
+      avatar: 'happy',
       theme: 'linheng',
       balance: 684.00,
       interestRate: 5, // 5% APR
@@ -27,7 +27,7 @@ const DEFAULT_DATABASE = {
     },
     yitong: {
       name: 'Yitong',
-      avatar: '😈',
+      avatar: 'happy',
       theme: 'yitong',
       balance: 702.86,
       interestRate: 5, // 5% APR
@@ -125,7 +125,7 @@ function initDatabase() {
         const initialInterestDateStr = initialLastInterest.toISOString();
 
         db.profiles.linheng.balance = 684.00;
-        db.profiles.linheng.avatar = '🐷';
+        db.profiles.linheng.avatar = 'happy';
         db.profiles.linheng.interestRate = 5;
         db.profiles.linheng.totalInterest = 0.00;
         db.profiles.linheng.completedQuests = 0;
@@ -138,7 +138,7 @@ function initDatabase() {
         ];
         
         db.profiles.yitong.balance = 702.86;
-        db.profiles.yitong.avatar = '😈';
+        db.profiles.yitong.avatar = 'happy';
         db.profiles.yitong.interestRate = 5;
         db.profiles.yitong.totalInterest = 0.00;
         db.profiles.yitong.completedQuests = 0;
@@ -194,17 +194,17 @@ function renderApp() {
   // Update active avatar emoji on the Piggy Vault card badge
   const activeAvatarEmoji = document.getElementById("activeAvatarEmoji");
   if (activeAvatarEmoji) {
-    activeAvatarEmoji.innerText = profile.avatar || (activeKid === 'linheng' ? '🐷' : '😈');
+    activeAvatarEmoji.innerHTML = getAvatarSVG(activeKid, profile.avatar || 'happy', 24);
   }
 
   // Update avatars dynamically in the header profile tabs
   const linhengAvatarDiv = document.querySelector(".avatar-linheng");
   if (linhengAvatarDiv) {
-    linhengAvatarDiv.innerText = db.profiles.linheng.avatar || '🐷';
+    linhengAvatarDiv.innerHTML = getAvatarSVG('linheng', db.profiles.linheng.avatar || 'happy', 24);
   }
   const yitongAvatarDiv = document.querySelector(".avatar-yitong");
   if (yitongAvatarDiv) {
-    yitongAvatarDiv.innerText = db.profiles.yitong.avatar || '😈';
+    yitongAvatarDiv.innerHTML = getAvatarSVG('yitong', db.profiles.yitong.avatar || 'happy', 24);
   }
 
   // Header active profile tab toggle state
@@ -1713,34 +1713,288 @@ function showToast(title, msg, type = 'info') {
 }
 
 /* ==========================================
-   MOOD SELECTOR LOGIC (KID PORTAL MOOD AVATARS)
+   MOOD SELECTOR LOGIC (DYNAMIC PROGRAMMATIC SVG AVATARS)
    ========================================== */
 const MOOD_DATA = {
   linheng: [
-    { emoji: '🐷😊', name: 'Happy' },
-    { emoji: '🐷🕶️', name: 'Cool' },
-    { emoji: '🐷😢', name: 'Sad' },
-    { emoji: '🐷🤯', name: 'Exploding' },
-    { emoji: '🐷👑', name: 'Royal' },
-    { emoji: '🐷🥳', name: 'Party' },
-    { emoji: '🐷😴', name: 'Sleepy' },
-    { emoji: '🐷😡', name: 'Angry' },
-    { emoji: '🐷🤢', name: 'Sick' },
-    { emoji: '🐷😇', name: 'Angel' }
+    { id: 'happy', name: 'Happy' },
+    { id: 'cool', name: 'Cool' },
+    { id: 'sad', name: 'Sad' },
+    { id: 'exploding', name: 'Exploding' },
+    { id: 'royal', name: 'Royal' },
+    { id: 'party', name: 'Party' },
+    { id: 'sleepy', name: 'Sleepy' },
+    { id: 'angry', name: 'Angry' },
+    { id: 'sick', name: 'Sick' },
+    { id: 'angel', name: 'Angel' }
   ],
   yitong: [
-    { emoji: '😈😊', name: 'Happy' },
-    { emoji: '😈🕶️', name: 'Cool' },
-    { emoji: '😈😢', name: 'Sad' },
-    { emoji: '😈🤯', name: 'Exploding' },
-    { emoji: '😈👑', name: 'Royal' },
-    { emoji: '😈🥳', name: 'Party' },
-    { emoji: '😈😴', name: 'Sleepy' },
-    { emoji: '😈😡', name: 'Angry' },
-    { emoji: '😈🤢', name: 'Sick' },
-    { emoji: '😈😇', name: 'Angel' }
+    { id: 'happy', name: 'Happy' },
+    { id: 'cool', name: 'Cool' },
+    { id: 'sad', name: 'Sad' },
+    { id: 'exploding', name: 'Exploding' },
+    { id: 'royal', name: 'Royal' },
+    { id: 'party', name: 'Party' },
+    { id: 'sleepy', name: 'Sleepy' },
+    { id: 'angry', name: 'Angry' },
+    { id: 'sick', name: 'Sick' },
+    { id: 'angel', name: 'Angel' }
   ]
 };
+
+// Generates dynamic vector SVGs for character mood profiles
+function getAvatarSVG(character, mood, size = 40) {
+  // Normalize mood key
+  let m = (mood || 'happy').toLowerCase();
+  if (m.includes('😊') || m.includes('happy')) m = 'happy';
+  else if (m.includes('🕶️') || m.includes('cool')) m = 'cool';
+  else if (m.includes('😢') || m.includes('sad')) m = 'sad';
+  else if (m.includes('🤯') || m.includes('exploding')) m = 'exploding';
+  else if (m.includes('👑') || m.includes('royal')) m = 'royal';
+  else if (m.includes('🥳') || m.includes('party')) m = 'party';
+  else if (m.includes('😴') || m.includes('sleepy')) m = 'sleepy';
+  else if (m.includes('😡') || m.includes('angry')) m = 'angry';
+  else if (m.includes('🤢') || m.includes('sick')) m = 'sick';
+  else if (m.includes('😇') || m.includes('angel')) m = 'angel';
+  else m = 'happy';
+
+  let svgContent = '';
+
+  if (character === 'linheng') {
+    // Cute Pink Piggy Avatar Base
+    let headColor = '#f48fb1';
+    let outlineColor = '#ec4899';
+    let snoutColor = '#f8bbd0';
+    let earColor = '#f48fb1';
+    let innerEarColor = '#f8bbd0';
+
+    if (m === 'angry') {
+      headColor = '#f43f5e';
+      outlineColor = '#be123c';
+      earColor = '#f43f5e';
+      innerEarColor = '#fda4af';
+    } else if (m === 'sick') {
+      headColor = '#a7f3d0';
+      outlineColor = '#059669';
+      earColor = '#a7f3d0';
+      innerEarColor = '#d1fae5';
+    }
+
+    svgContent += `
+      <!-- Ears -->
+      <polygon points="25,35 12,12 40,23" fill="${earColor}" stroke="${outlineColor}" stroke-width="3" stroke-linejoin="round" />
+      <polygon points="27,32 17,17 37,23" fill="${innerEarColor}" />
+      <polygon points="75,35 88,12 60,23" fill="${earColor}" stroke="${outlineColor}" stroke-width="3" stroke-linejoin="round" />
+      <polygon points="73,32 83,17 63,23" fill="${innerEarColor}" />
+      
+      <!-- Head -->
+      <circle cx="50" cy="55" r="35" fill="${headColor}" stroke="${outlineColor}" stroke-width="3" />
+      
+      <!-- Snout -->
+      <ellipse cx="50" cy="62" rx="14" ry="10" fill="${snoutColor}" stroke="${outlineColor}" stroke-width="2.5" />
+      <ellipse cx="45" cy="62" rx="2.5" ry="4" fill="${outlineColor}" />
+      <ellipse cx="55" cy="62" rx="2.5" ry="4" fill="${outlineColor}" />
+    `;
+
+    if (m === 'happy') {
+      svgContent += `
+        <path d="M 30,45 Q 36,38 42,45" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 58,45 Q 64,38 70,45" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 44,77 Q 50,85 56,77" fill="none" stroke="${outlineColor}" stroke-width="3.5" stroke-linecap="round" />
+      `;
+    } else if (m === 'cool') {
+      svgContent += `
+        <rect x="23" y="38" width="22" height="12" rx="3" fill="#1e293b" />
+        <rect x="55" y="38" width="22" height="12" rx="3" fill="#1e293b" />
+        <line x1="43" y1="44" x2="57" y2="44" stroke="#1e293b" stroke-width="4" />
+        <path d="M 44,76 L 56,76" fill="none" stroke="${outlineColor}" stroke-width="3.5" stroke-linecap="round" />
+      `;
+    } else if (m === 'sad') {
+      svgContent += `
+        <path d="M 30,44 Q 36,49 42,44" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 58,44 Q 64,49 70,44" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 33,52 C 33,52 30,57 30,59 A 3,3 0 0,0 36,59 C 36,57 33,52 33,52 Z" fill="#60a5fa" />
+        <path d="M 44,79 Q 50,73 56,79" fill="none" stroke="${outlineColor}" stroke-width="3.5" stroke-linecap="round" />
+      `;
+    } else if (m === 'exploding') {
+      svgContent += `
+        <circle cx="36" cy="45" r="7" fill="#fff" stroke="${outlineColor}" stroke-width="2" />
+        <circle cx="36" cy="45" r="2.5" fill="#000" />
+        <circle cx="64" cy="45" r="7" fill="#fff" stroke="${outlineColor}" stroke-width="2" />
+        <circle cx="64" cy="45" r="2.5" fill="#000" />
+        <circle cx="50" cy="79" r="6" fill="${outlineColor}" />
+        <circle cx="15" cy="20" r="3" fill="#fbbf24" />
+        <circle cx="85" cy="20" r="3" fill="#fbbf24" />
+        <circle cx="10" cy="55" r="3" fill="#f43f5e" />
+        <circle cx="90" cy="55" r="3" fill="#f43f5e" />
+      `;
+    } else if (m === 'royal') {
+      svgContent += `
+        <path d="M 30,45 Q 36,38 42,45" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 58,45 Q 64,38 70,45" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 44,77 Q 50,85 56,77" fill="none" stroke="${outlineColor}" stroke-width="3.5" stroke-linecap="round" />
+        <polygon points="35,23 38,10 44,16 50,8 56,16 62,10 65,23" fill="#fbbf24" stroke="#d97706" stroke-width="2" stroke-linejoin="round" />
+        <circle cx="38" cy="9" r="1.5" fill="#ef4444" />
+        <circle cx="50" cy="7" r="1.5" fill="#3b82f6" />
+        <circle cx="62" cy="9" r="1.5" fill="#ef4444" />
+      `;
+    } else if (m === 'party') {
+      svgContent += `
+        <path d="M 30,45 Q 36,38 42,45" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 58,48 L 70,42 M 58,42 L 70,48" stroke="${outlineColor}" stroke-width="4" stroke-linecap="round" />
+        <polygon points="20,25 35,-5 50,15" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
+        <circle cx="35" cy="-5" r="3" fill="#ef4444" />
+        <path d="M 44,77 Q 50,85 56,77" fill="none" stroke="${outlineColor}" stroke-width="3.5" />
+        <path d="M 54,76 L 68,78 Q 72,78 70,82 Q 66,84 62,80" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" />
+      `;
+    } else if (m === 'sleepy') {
+      svgContent += `
+        <line x1="28" y1="45" x2="40" y2="45" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <line x1="60" y1="45" x2="72" y2="45" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <circle cx="50" cy="78" r="4.5" fill="none" stroke="${outlineColor}" stroke-width="3" />
+        <text x="80" y="30" font-family="Outfit" font-size="12" fill="#3b82f6" font-weight="bold">z</text>
+        <text x="88" y="20" font-family="Outfit" font-size="16" fill="#3b82f6" font-weight="bold">Z</text>
+      `;
+    } else if (m === 'angry') {
+      svgContent += `
+        <line x1="26" y1="36" x2="42" y2="44" stroke="${outlineColor}" stroke-width="5" stroke-linecap="round" />
+        <line x1="74" y1="36" x2="58" y2="44" stroke="${outlineColor}" stroke-width="5" stroke-linecap="round" />
+        <circle cx="35" cy="47" r="4.5" fill="#fff" />
+        <circle cx="35" cy="47" r="2.5" fill="#000" />
+        <circle cx="65" cy="47" r="4.5" fill="#fff" />
+        <circle cx="65" cy="47" r="2.5" fill="#000" />
+        <path d="M 42,78 Q 50,71 58,78" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+      `;
+    } else if (m === 'sick') {
+      svgContent += `
+        <path d="M 28,40 L 40,50 M 40,40 L 28,50" fill="none" stroke="${outlineColor}" stroke-width="4" stroke-linecap="round" />
+        <path d="M 60,40 L 72,50 M 72,40 L 60,50" fill="none" stroke="${outlineColor}" stroke-width="4" stroke-linecap="round" />
+        <path d="M 40,78 Q 45,74 50,78 T 60,74" fill="none" stroke="${outlineColor}" stroke-width="3" stroke-linecap="round" />
+      `;
+    } else if (m === 'angel') {
+      svgContent += `
+        <path d="M 30,45 Q 36,38 42,45" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 58,45 Q 64,38 70,45" fill="none" stroke="${outlineColor}" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 45,76 Q 50,81 55,76" fill="none" stroke="${outlineColor}" stroke-width="3.5" stroke-linecap="round" />
+        <ellipse cx="50" cy="12" rx="20" ry="5" fill="none" stroke="#fbbf24" stroke-width="3.5" />
+        <ellipse cx="50" cy="12" rx="20" ry="5" fill="none" stroke="#fbbf24" stroke-width="1.5" opacity="0.5" />
+      `;
+    }
+  } else {
+    // Tasmanian Devil Avatar Base (Yitong)
+    let headColor = '#8b5cf6';
+    let outlineColor = '#6d28d9';
+    let hornColor = '#f43f5e';
+    let hornOutline = '#be123c';
+
+    if (m === 'angry') {
+      headColor = '#ef4444';
+      outlineColor = '#991b1b';
+      hornColor = '#7f1d1d';
+      hornOutline = '#450a0a';
+    } else if (m === 'sick') {
+      headColor = '#d9f99d';
+      outlineColor = '#4d7c0f';
+      hornColor = '#a3e635';
+      hornOutline = '#3f6212';
+    }
+
+    svgContent += `
+      <!-- Horns -->
+      <polygon points="20,25 6,2 35,15" fill="${hornColor}" stroke="${hornOutline}" stroke-width="3" stroke-linejoin="round" />
+      <polygon points="80,25 94,2 65,15" fill="${hornColor}" stroke="${hornOutline}" stroke-width="3" stroke-linejoin="round" />
+      
+      <!-- Head -->
+      <circle cx="50" cy="55" r="35" fill="${headColor}" stroke="${outlineColor}" stroke-width="3" />
+      
+      <!-- Mouth -->
+      <path d="M 36,66 Q 50,85 64,66 Z" fill="#4c1d95" stroke="${outlineColor}" stroke-width="2" />
+      <polygon points="40,66 44,74 48,66" fill="#fff" />
+      <polygon points="52,66 56,74 60,66" fill="#fff" />
+    `;
+
+    if (m === 'happy') {
+      svgContent += `
+        <path d="M 28,45 Q 36,36 42,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 72,45 Q 64,36 58,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+      `;
+    } else if (m === 'cool') {
+      svgContent += `
+        <rect x="23" y="36" width="22" height="14" rx="3" fill="#1e293b" />
+        <rect x="55" y="36" width="22" height="14" rx="3" fill="#1e293b" />
+        <line x1="43" y1="43" x2="57" y2="43" stroke="#1e293b" stroke-width="4" />
+      `;
+    } else if (m === 'sad') {
+      svgContent += `
+        <path d="M 28,42 Q 36,48 42,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 72,42 Q 64,48 58,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 33,52 C 33,52 30,57 30,59 A 3,3 0 0,0 36,59 C 36,57 33,52 33,52 Z" fill="#60a5fa" />
+        <path d="M 36,66 Q 50,85 64,66" fill="none" stroke="#4c1d95" stroke-width="3" />
+        <path d="M 38,76 Q 50,66 62,76" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+      `;
+    } else if (m === 'exploding') {
+      svgContent += `
+        <circle cx="35" cy="44" r="8" fill="#fff" stroke="${outlineColor}" stroke-width="2" />
+        <circle cx="35" cy="44" r="3" fill="#000" />
+        <circle cx="65" cy="44" r="8" fill="#fff" stroke="${outlineColor}" stroke-width="2" />
+        <circle cx="65" cy="44" r="3" fill="#000" />
+        <circle cx="50" cy="74" r="8" fill="#4c1d95" />
+        <circle cx="15" cy="20" r="3" fill="#f59e0b" />
+        <circle cx="85" cy="20" r="3" fill="#f59e0b" />
+      `;
+    } else if (m === 'royal') {
+      svgContent += `
+        <path d="M 28,45 Q 36,36 42,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 72,45 Q 64,36 58,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <polygon points="35,23 38,10 44,16 50,8 56,16 62,10 65,23" fill="#fbbf24" stroke="#d97706" stroke-width="2" stroke-linejoin="round" />
+      `;
+    } else if (m === 'party') {
+      svgContent += `
+        <path d="M 28,45 Q 36,36 42,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 58,48 L 70,42 M 58,42 L 70,48" stroke="#4c1d95" stroke-width="4" stroke-linecap="round" />
+        <polygon points="20,25 35,-5 50,15" fill="#10b981" stroke="#047857" stroke-width="2" />
+        <circle cx="35" cy="-5" r="3" fill="#fbbf24" />
+      `;
+    } else if (m === 'sleepy') {
+      svgContent += `
+        <line x1="26" y1="44" x2="38" y2="44" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <line x1="62" y1="44" x2="74" y2="44" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <circle cx="50" cy="74" r="4.5" fill="none" stroke="#4c1d95" stroke-width="3" />
+        <text x="82" y="28" font-family="Outfit" font-size="12" fill="#a78bfa" font-weight="bold">z</text>
+        <text x="90" y="18" font-family="Outfit" font-size="16" fill="#a78bfa" font-weight="bold">Z</text>
+      `;
+    } else if (m === 'angry') {
+      svgContent += `
+        <line x1="24" y1="36" x2="42" y2="44" stroke="#7f1d1d" stroke-width="5" stroke-linecap="round" />
+        <line x1="76" y1="36" x2="58" y2="44" stroke="#7f1d1d" stroke-width="5" stroke-linecap="round" />
+        <circle cx="34" cy="47" r="4.5" fill="#fff" />
+        <circle cx="34" cy="47" r="2.5" fill="#000" />
+        <circle cx="66" cy="47" r="4.5" fill="#fff" />
+        <circle cx="66" cy="47" r="2.5" fill="#000" />
+        <path d="M 36,74 Q 50,62 64,74" fill="none" stroke="#7f1d1d" stroke-width="5" stroke-linecap="round" />
+      `;
+    } else if (m === 'sick') {
+      svgContent += `
+        <path d="M 28,40 L 40,50 M 40,40 L 28,50" fill="none" stroke="#4d7c0f" stroke-width="4" stroke-linecap="round" />
+        <path d="M 60,40 L 72,50 M 72,40 L 60,50" fill="none" stroke="#4d7c0f" stroke-width="4" stroke-linecap="round" />
+        <path d="M 38,74 Q 45,78 50,74 T 62,78" fill="none" stroke="#4d7c0f" stroke-width="3" stroke-linecap="round" />
+      `;
+    } else if (m === 'angel') {
+      svgContent += `
+        <path d="M 28,45 Q 36,36 42,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 72,45 Q 64,36 58,42" fill="none" stroke="#4c1d95" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M 40,70 Q 50,80 60,70" fill="none" stroke="#4c1d95" stroke-width="3.5" stroke-linecap="round" />
+        <ellipse cx="50" cy="12" rx="20" ry="5" fill="none" stroke="#fbbf24" stroke-width="3.5" />
+      `;
+    }
+  }
+
+  return `
+    <svg viewBox="0 0 100 100" width="${size}px" height="${size}px" style="display: block; overflow: visible;">
+      ${svgContent}
+    </svg>
+  `;
+}
 
 function openMoodSelectorModal() {
   const activeKid = db.activeKid;
@@ -1752,17 +2006,32 @@ function openMoodSelectorModal() {
   grid.innerHTML = "";
   
   moods.forEach(mood => {
-    const currentAvatar = profile.avatar || (activeKid === 'linheng' ? '🐷' : '😈');
-    const isActive = currentAvatar === mood.emoji;
+    const currentAvatar = profile.avatar || 'happy';
+    let normalizedAvatar = currentAvatar.toLowerCase();
+    if (normalizedAvatar.includes('😊') || normalizedAvatar.includes('happy')) normalizedAvatar = 'happy';
+    else if (normalizedAvatar.includes('🕶️') || normalizedAvatar.includes('cool')) normalizedAvatar = 'cool';
+    else if (normalizedAvatar.includes('😢') || normalizedAvatar.includes('sad')) normalizedAvatar = 'sad';
+    else if (normalizedAvatar.includes('🤯') || normalizedAvatar.includes('exploding')) normalizedAvatar = 'exploding';
+    else if (normalizedAvatar.includes('👑') || normalizedAvatar.includes('royal')) normalizedAvatar = 'royal';
+    else if (normalizedAvatar.includes('🥳') || normalizedAvatar.includes('party')) normalizedAvatar = 'party';
+    else if (normalizedAvatar.includes('😴') || normalizedAvatar.includes('sleepy')) normalizedAvatar = 'sleepy';
+    else if (normalizedAvatar.includes('😡') || normalizedAvatar.includes('angry')) normalizedAvatar = 'angry';
+    else if (normalizedAvatar.includes('🤢') || normalizedAvatar.includes('sick')) normalizedAvatar = 'sick';
+    else if (normalizedAvatar.includes('😇') || normalizedAvatar.includes('angel')) normalizedAvatar = 'angel';
+    else normalizedAvatar = 'happy';
+
+    const isActive = normalizedAvatar === mood.id;
     
     const chip = document.createElement("button");
     chip.type = "button";
     chip.className = `mood-chip ${isActive ? 'active' : ''}`;
     chip.innerHTML = `
-      <span class="mood-emoji">${mood.emoji}</span>
+      <div class="mood-emoji" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+        ${getAvatarSVG(activeKid, mood.id, 48)}
+      </div>
       <span class="mood-name">${mood.name}</span>
     `;
-    chip.onclick = () => selectMoodAvatar(mood.emoji);
+    chip.onclick = () => selectMoodAvatar(mood.id);
     grid.appendChild(chip);
   });
   
@@ -1774,14 +2043,14 @@ function closeMoodSelectorModal() {
   if (modal) modal.classList.add("hidden");
 }
 
-function selectMoodAvatar(emoji) {
+function selectMoodAvatar(moodId) {
   const activeKid = db.activeKid;
   const profile = db.profiles[activeKid];
   
-  profile.avatar = emoji;
+  profile.avatar = moodId;
   saveDatabase();
   renderApp();
   closeMoodSelectorModal();
   
-  showToast("Mood Updated!", `Changed your avatar to ${emoji}!`, "success");
+  showToast("Mood Updated!", `${profile.name} changed mood to ${moodId.toUpperCase()}!`, "success");
 }
