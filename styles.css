@@ -348,7 +348,7 @@ body {
 
 .active-badge {
   background: rgba(255, 255, 255, 0.06);
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 700;
@@ -356,6 +356,29 @@ body {
   color: var(--accent-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.active-badge:hover {
+  background: var(--accent-primary) !important;
+  color: #fff !important;
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 20px var(--accent-glow);
+}
+
+.active-badge #activeAvatarEmoji {
+  font-size: 14px;
+}
+
+.active-badge i {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-left: 2px;
 }
 
 /* ==========================================
@@ -2103,5 +2126,78 @@ input:checked + .slider:before {
     text-align: center;
   }
 }
+
+/* MOOD SELECTOR STYLES */
+.mood-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  padding: 12px 4px;
+}
+
+.mood-chip {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mood-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent-primary);
+  transform: scale(1.08) translateY(-4px);
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+.mood-chip.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.mood-chip .mood-emoji {
+  font-size: 32px;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+}
+
+.mood-chip:hover .mood-emoji {
+  transform: scale(1.15);
+}
+
+.mood-chip .mood-name {
+  font-family: var(--font-kid);
+  font-size: 11px;
+  font-weight: 700;
+  color: #f1f5f9;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .mood-selection-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mood-selection-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .mood-chip {
+    padding: 12px 8px;
+  }
+  .mood-chip .mood-emoji {
+    font-size: 28px;
+  }
+}
+
 
 

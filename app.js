@@ -191,6 +191,22 @@ function renderApp() {
   document.getElementById("totalInterestDisplay").innerText = `+${formatCurrency(profile.totalInterest)}`;
   document.getElementById("completedQuestsDisplay").innerText = profile.completedQuests;
 
+  // Update active avatar emoji on the Piggy Vault card badge
+  const activeAvatarEmoji = document.getElementById("activeAvatarEmoji");
+  if (activeAvatarEmoji) {
+    activeAvatarEmoji.innerText = profile.avatar || (activeKid === 'linheng' ? '🐷' : '😈');
+  }
+
+  // Update avatars dynamically in the header profile tabs
+  const linhengAvatarDiv = document.querySelector(".avatar-linheng");
+  if (linhengAvatarDiv) {
+    linhengAvatarDiv.innerText = db.profiles.linheng.avatar || '🐷';
+  }
+  const yitongAvatarDiv = document.querySelector(".avatar-yitong");
+  if (yitongAvatarDiv) {
+    yitongAvatarDiv.innerText = db.profiles.yitong.avatar || '😈';
+  }
+
   // Header active profile tab toggle state
   const tabs = document.querySelectorAll(".profile-tab");
   tabs.forEach(tab => {
@@ -1694,4 +1710,78 @@ function showToast(title, msg, type = 'info') {
   window.toastTimeout = setTimeout(() => {
     toast.classList.add("hidden");
   }, 4000);
+}
+
+/* ==========================================
+   MOOD SELECTOR LOGIC (KID PORTAL MOOD AVATARS)
+   ========================================== */
+const MOOD_DATA = {
+  linheng: [
+    { emoji: '🐷😊', name: 'Happy' },
+    { emoji: '🐷🕶️', name: 'Cool' },
+    { emoji: '🐷😢', name: 'Sad' },
+    { emoji: '🐷🤯', name: 'Exploding' },
+    { emoji: '🐷👑', name: 'Royal' },
+    { emoji: '🐷🥳', name: 'Party' },
+    { emoji: '🐷😴', name: 'Sleepy' },
+    { emoji: '🐷😡', name: 'Angry' },
+    { emoji: '🐷🤢', name: 'Sick' },
+    { emoji: '🐷😇', name: 'Angel' }
+  ],
+  yitong: [
+    { emoji: '😈😊', name: 'Happy' },
+    { emoji: '😈🕶️', name: 'Cool' },
+    { emoji: '😈😢', name: 'Sad' },
+    { emoji: '😈🤯', name: 'Exploding' },
+    { emoji: '😈👑', name: 'Royal' },
+    { emoji: '😈🥳', name: 'Party' },
+    { emoji: '😈😴', name: 'Sleepy' },
+    { emoji: '😈😡', name: 'Angry' },
+    { emoji: '😈🤢', name: 'Sick' },
+    { emoji: '😈😇', name: 'Angel' }
+  ]
+};
+
+function openMoodSelectorModal() {
+  const activeKid = db.activeKid;
+  const profile = db.profiles[activeKid];
+  const moods = MOOD_DATA[activeKid] || [];
+  const grid = document.getElementById("moodSelectorGrid");
+  
+  if (!grid) return;
+  grid.innerHTML = "";
+  
+  moods.forEach(mood => {
+    const currentAvatar = profile.avatar || (activeKid === 'linheng' ? '🐷' : '😈');
+    const isActive = currentAvatar === mood.emoji;
+    
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = `mood-chip ${isActive ? 'active' : ''}`;
+    chip.innerHTML = `
+      <span class="mood-emoji">${mood.emoji}</span>
+      <span class="mood-name">${mood.name}</span>
+    `;
+    chip.onclick = () => selectMoodAvatar(mood.emoji);
+    grid.appendChild(chip);
+  });
+  
+  document.getElementById("moodSelectorModal").classList.remove("hidden");
+}
+
+function closeMoodSelectorModal() {
+  const modal = document.getElementById("moodSelectorModal");
+  if (modal) modal.classList.add("hidden");
+}
+
+function selectMoodAvatar(emoji) {
+  const activeKid = db.activeKid;
+  const profile = db.profiles[activeKid];
+  
+  profile.avatar = emoji;
+  saveDatabase();
+  renderApp();
+  closeMoodSelectorModal();
+  
+  showToast("Mood Updated!", `Changed your avatar to ${emoji}!`, "success");
 }

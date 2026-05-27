@@ -67,7 +67,11 @@
       <section class="dash-card piggy-card card-glow">
         <div class="card-header-kid">
           <h2 class="fredoka-font">My Piggy Bank</h2>
-          <span class="active-badge" id="kidNameBadge">Linheng's Vault</span>
+          <button class="active-badge" id="kidMoodBadge" onclick="openMoodSelectorModal()" title="Change My Mood Avatar!">
+            <span id="activeAvatarEmoji">🐷</span>
+            <span id="kidNameBadge">Linheng's Vault</span>
+            <i class="fa-solid fa-face-smile"></i>
+          </button>
         </div>
 
         <!-- Animated Piggy SVG Area -->
@@ -404,7 +408,7 @@
     <!-- ==================== FOOTER BUILD SIGNATURE ==================== -->
     <footer class="app-footer">
       <div class="footer-content">
-        <span class="footer-item"><i class="fa-solid fa-code-branch"></i> Version: <strong>1.4.0</strong></span>
+        <span class="footer-item"><i class="fa-solid fa-code-branch"></i> Version: <strong>1.5.0</strong></span>
         <span class="footer-item"><i class="fa-solid fa-calendar-day"></i> Build Date: <strong>2026-05-27</strong></span>
         <span class="footer-item"><i class="fa-solid fa-circle-check text-green"></i> Deployment: <strong>Vercel Stable</strong></span>
       </div>
@@ -560,6 +564,26 @@
         <button class="save-goal-btn" onclick="submitProposedChore()">
           <i class="fa-solid fa-paper-plane"></i> Send to Parents
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MOOD SELECTOR MODAL (KID MODE) -->
+  <div class="modal-overlay hidden" id="moodSelectorModal">
+    <div class="goal-card glassmorphism bounce-in">
+      <button class="close-modal-btn" onclick="closeMoodSelectorModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-face-laugh-beam text-yellow"></i> Choose My Mood</h3>
+        <p>Select your character's active mood avatar!</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="mood-selection-grid" id="moodSelectorGrid">
+          <!-- Populated dynamically in JavaScript -->
+        </div>
       </div>
     </div>
   </div>
