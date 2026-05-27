@@ -527,6 +527,16 @@ body {
   letter-spacing: 0.5px;
 }
 
+.bal-established {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: -2px;
+  margin-bottom: 10px;
+  opacity: 0.8;
+  letter-spacing: 0.2px;
+}
+
 .interest-rate-chip {
   display: inline-flex;
   align-items: center;
