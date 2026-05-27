@@ -1781,11 +1781,11 @@ function getAvatarSVG(character, mood, size = 40) {
     }
 
     svgContent += `
-      <!-- Ears -->
-      <polygon points="25,35 12,12 40,23" fill="${earColor}" stroke="${outlineColor}" stroke-width="3" stroke-linejoin="round" />
-      <polygon points="27,32 17,17 37,23" fill="${innerEarColor}" />
-      <polygon points="75,35 88,12 60,23" fill="${earColor}" stroke="${outlineColor}" stroke-width="3" stroke-linejoin="round" />
-      <polygon points="73,32 83,17 63,23" fill="${innerEarColor}" />
+      <!-- Ears (Cute Rounded Floppy Piggy Ears) -->
+      <path d="M 22,35 C 10,25 14,8 28,14 C 36,17 38,28 35,34 Z" fill="${earColor}" stroke="${outlineColor}" stroke-width="3" stroke-linejoin="round" />
+      <path d="M 24,32 C 15,24 18,13 27,17 C 32,19 34,27 32,31 Z" fill="${innerEarColor}" />
+      <path d="M 78,35 C 90,25 86,8 72,14 C 64,17 62,28 65,34 Z" fill="${earColor}" stroke="${outlineColor}" stroke-width="3" stroke-linejoin="round" />
+      <path d="M 76,32 C 85,24 82,13 73,17 C 68,19 66,27 68,31 Z" fill="${innerEarColor}" />
       
       <!-- Head -->
       <circle cx="50" cy="55" r="35" fill="${headColor}" stroke="${outlineColor}" stroke-width="3" />
