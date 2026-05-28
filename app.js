@@ -50,6 +50,7 @@ let forecastChartInstance = null;
 let forecastChartKidInstance = null;
 let timeWarpInterval = null;
 let realTimeInterestInterval = null;
+let lastLoadedKid = null;
 
 // Piggy Speech tips array
 const PIGGY_TIPS = [
@@ -61,6 +62,20 @@ const PIGGY_TIPS = [
   "I wonder what is on {sibling}'s wishlist today!",
   "Every single penny saved fills up your PiggyVault!",
   "Ask Mom or Dad to set a high interest rate for big returns!"
+];
+
+// Piggy Speech jokes array for greeting when entering a vault
+const PIGGY_JOKES = [
+  "Why did the pig put money in the freezer? He wanted cold, hard cash!",
+  "Where does a pig keep his money? In a piggy bank, of course!",
+  "Why are piggy banks so smart? They make a lot of cents!",
+  "What did the dollar bill say to the penny? You make perfect cents!",
+  "Why did the cookie go to the bank? Because it wanted to make a lot of dough!",
+  "Where do fish keep their money? In a river bank!",
+  "What do you call a pig who does magic? Harry Plopper! Just kidding, a pig-pocket!",
+  "Why are coins so good at sports? Because they love to flip!",
+  "What did one penny say to the other? Together we make cents!",
+  "Where do pigs get their money? From the oak tree branch banks!"
 ];
 
 /* ==========================================
@@ -251,6 +266,14 @@ function renderApp() {
   if (document.getElementById("parentView").classList.contains("hidden") === false) {
     renderParentApprovals();
     renderGrowthChart();
+  }
+
+  // Dynamic joke greeting when entering a vault (either on boot or when switching kids)
+  const bubble = document.getElementById("speechBubble");
+  if (bubble && lastLoadedKid !== activeKid) {
+    const randomJoke = PIGGY_JOKES[Math.floor(Math.random() * PIGGY_JOKES.length)];
+    bubble.innerText = randomJoke;
+    lastLoadedKid = activeKid;
   }
 }
 
