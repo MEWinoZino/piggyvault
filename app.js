@@ -2099,3 +2099,135 @@ function selectMoodAvatar(moodId) {
   
   showToast("Mood Updated!", `${profile.name} changed mood to ${moodId.toUpperCase()}!`, "success");
 }
+
+/* ==========================================
+   DELTA HISTORY MODAL CONTROLLER
+   ========================================== */
+function openDeltaHistoryModal() {
+  const activeKid = db.activeKid;
+  const profile = db.profiles[activeKid];
+  const modal = document.getElementById("deltaHistoryModal");
+  if (!modal) return;
+
+  const initialBalance = activeKid === 'linheng' ? 684.00 : 702.86;
+  const netDelta = profile.balance - initialBalance;
+  
+  // Update header text
+  document.getElementById("deltaHistoryTitle").innerText = `${profile.name}'s savings breakdown since 2026/05/25`;
+  
+  // Categorize money made (deposits) and spent (withdrawals)
+  let totalMade = 0;
+  let totalSpent = 0;
+  
+  let madeChores = 0;
+  let madeInterest = 0;
+  let madeAllowance = 0;
+  let madeTransfer = 0;
+  let madeParent = 0;
+  
+  let spentGoals = 0;
+  let spentTransfer = 0;
+  let spentParent = 0;
+
+  profile.transactions.forEach(t => {
+    // Skip the pocket base foundation deposit itself
+    if (t.id === 101 || t.id === 201) return;
+    
+    const amount = Number(t.amount || 0);
+    const desc = (t.desc || "").toLowerCase();
+    
+    if (t.type === 'deposit') {
+      totalMade += amount;
+      if (desc.includes('quest') || desc.includes('chore') || desc.includes('proposed')) {
+        madeChores += amount;
+      } else if (desc.includes('interest')) {
+        madeInterest += amount;
+      } else if (desc.includes('allowance')) {
+        madeAllowance += amount;
+      } else if (desc.includes('sibling') || desc.includes('transfer from') || desc.includes('received from')) {
+        madeTransfer += amount;
+      } else {
+        madeParent += amount;
+      }
+    } else if (t.type === 'withdrawal') {
+      totalSpent += amount;
+      if (desc.includes('goal') || desc.includes('purchased') || desc.includes('wishlist') || desc.includes('buy goal')) {
+        spentGoals += amount;
+      } else if (desc.includes('sibling') || desc.includes('transfer to') || desc.includes('sent to')) {
+        spentTransfer += amount;
+      } else {
+        spentParent += amount;
+      }
+    }
+  });
+
+  // Render Delta Summary Card
+  const deltaSummaryCard = document.getElementById("deltaSummaryCard");
+  const sign = netDelta >= 0 ? "+" : "";
+  const colorClass = netDelta >= 0 ? "text-green" : "text-red";
+  
+  deltaSummaryCard.innerHTML = `
+    <span class="delta-summary-label">NET BALANCE DELTA</span>
+    <span class="delta-summary-val ${colorClass}">${sign}${formatCurrency(netDelta)}</span>
+    <span class="delta-summary-label" style="margin-top: 6px; font-weight: normal; opacity: 0.85;">
+      Starting pocket: <strong>${formatCurrency(initialBalance)}</strong> · Current balance: <strong>${formatCurrency(profile.balance)}</strong>
+    </span>
+  `;
+
+  // Render Money Made Breakdown
+  const deltaMadeList = document.getElementById("deltaMadeList");
+  deltaMadeList.innerHTML = `
+    <div class="delta-breakdown-item item-green">
+      <span class="delta-item-label">🧹 Quest Chores</span>
+      <span class="delta-item-value text-green">+${formatCurrency(madeChores)}</span>
+    </div>
+    <div class="delta-breakdown-item item-green">
+      <span class="delta-item-label">📈 Interest Yields</span>
+      <span class="delta-item-value text-green">+${formatCurrency(madeInterest)}</span>
+    </div>
+    <div class="delta-breakdown-item item-green">
+      <span class="delta-item-label">🎁 Daily Allowances</span>
+      <span class="delta-item-value text-green">+${formatCurrency(madeAllowance)}</span>
+    </div>
+    <div class="delta-breakdown-item item-green">
+      <span class="delta-item-label">💸 Received Coins</span>
+      <span class="delta-item-value text-green">+${formatCurrency(madeTransfer)}</span>
+    </div>
+    <div class="delta-breakdown-item item-green">
+      <span class="delta-item-label">➕ Parent Deposits</span>
+      <span class="delta-item-value text-green">+${formatCurrency(madeParent)}</span>
+    </div>
+    <div class="delta-breakdown-item" style="border-left: none; background: rgba(255,255,255,0.06); font-weight: 700; margin-top: 4px;">
+      <span class="delta-item-label" style="color: #fff;">Gross Earnings</span>
+      <span class="delta-item-value text-green">+${formatCurrency(totalMade)}</span>
+    </div>
+  `;
+
+  // Render Money Spent Breakdown
+  const deltaSpentList = document.getElementById("deltaSpentList");
+  deltaSpentList.innerHTML = `
+    <div class="delta-breakdown-item item-pink">
+      <span class="delta-item-label">🎯 Wishlist Goals</span>
+      <span class="delta-item-value text-pink">-${formatCurrency(spentGoals)}</span>
+    </div>
+    <div class="delta-breakdown-item item-pink">
+      <span class="delta-item-label">💸 Transferred Coins</span>
+      <span class="delta-item-value text-pink">-${formatCurrency(spentTransfer)}</span>
+    </div>
+    <div class="delta-breakdown-item item-pink">
+      <span class="delta-item-label">➖ Parent Cashouts</span>
+      <span class="delta-item-value text-pink">-${formatCurrency(spentParent)}</span>
+    </div>
+    <div class="delta-breakdown-item" style="border-left: none; background: rgba(255,255,255,0.06); font-weight: 700; margin-top: 42px;">
+      <span class="delta-item-label" style="color: #fff;">Gross Outflow</span>
+      <span class="delta-item-value text-pink">-${formatCurrency(totalSpent)}</span>
+    </div>
+  `;
+
+  modal.classList.remove("hidden");
+}
+
+function closeDeltaHistoryModal() {
+  const modal = document.getElementById("deltaHistoryModal");
+  if (modal) modal.classList.add("hidden");
+}

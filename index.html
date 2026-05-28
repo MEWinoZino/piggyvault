@@ -114,7 +114,7 @@
         <div class="balance-display">
           <div class="bal-label">CURRENT SAVINGS</div>
           <div class="bal-value" id="currentBalanceDisplay">$0.00</div>
-          <div class="bal-established" id="balEstablishedNotice">Established since 2026/05/25</div>
+          <div class="bal-established" id="balEstablishedNotice" onclick="openDeltaHistoryModal()" title="Click to view where your money was spent and made!" style="cursor: pointer; transition: all 0.2s;">Established since 2026/05/25</div>
           
           <div class="interest-rate-chip" id="interestChip">
             <i class="fa-solid fa-chart-line"></i> Earning <span id="currentRateDisplay">6%</span> Interest
@@ -584,6 +584,48 @@
       <div class="modal-body">
         <div class="mood-selection-grid" id="moodSelectorGrid">
           <!-- Populated dynamically in JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. DELTA HISTORY MODAL (SAVINGS JOURNEY ANALYSIS) -->
+  <div class="modal-overlay hidden" id="deltaHistoryModal">
+    <div class="goal-card glassmorphism bounce-in" style="max-width: 500px; width: 90%;">
+      <button class="close-modal-btn" onclick="closeDeltaHistoryModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-chart-pie text-green"></i> Savings Journey</h3>
+        <p id="deltaHistoryTitle">Dynamic delta analysis since starting pocket</p>
+      </div>
+
+      <div class="modal-body">
+        <!-- Growth Delta Card -->
+        <div class="delta-summary-card" id="deltaSummaryCard">
+          <!-- Populated dynamically in JavaScript -->
+        </div>
+
+        <!-- Made vs Spent Columns -->
+        <div class="delta-details-columns">
+          
+          <!-- Column 1: Money Made -->
+          <div class="delta-col">
+            <h4 class="col-title text-green"><i class="fa-solid fa-arrow-trend-up"></i> How Money is Made</h4>
+            <div class="delta-breakdown-list" id="deltaMadeList">
+              <!-- Populated dynamically in JavaScript -->
+            </div>
+          </div>
+
+          <!-- Column 2: Money Spent -->
+          <div class="delta-col">
+            <h4 class="col-title text-pink"><i class="fa-solid fa-arrow-trend-down"></i> Where Money is Spent</h4>
+            <div class="delta-breakdown-list" id="deltaSpentList">
+              <!-- Populated dynamically in JavaScript -->
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
