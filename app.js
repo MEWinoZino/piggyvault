@@ -57,7 +57,8 @@ const PIGGY_TIPS = [
   "Pro Tip: Setting Goals helps you save faster!",
   "Did you know? Compound interest is like free money!",
   "Make sure to complete your chore quests to earn rewards!",
-  "Let's see what is on Yitong's wishlist today!",
+  "Let's see what is on {name}'s wishlist today!",
+  "I wonder what is on {sibling}'s wishlist today!",
   "Every single penny saved fills up your PiggyVault!",
   "Ask Mom or Dad to set a high interest rate for big returns!"
 ];
@@ -687,7 +688,17 @@ function triggerPiggyWiggle() {
 
   // Pick random speech bubble text
   const bubble = document.getElementById("speechBubble");
-  const randomTip = PIGGY_TIPS[Math.floor(Math.random() * PIGGY_TIPS.length)];
+  let randomTip = PIGGY_TIPS[Math.floor(Math.random() * PIGGY_TIPS.length)];
+  
+  // Replace placeholders dynamically based on active child
+  const activeName = db.profiles[activeKid].name;
+  const siblingKid = activeKid === 'linheng' ? 'yitong' : 'linheng';
+  const siblingName = db.profiles[siblingKid].name;
+  
+  randomTip = randomTip
+    .replace(/{name}/g, activeName)
+    .replace(/{sibling}/g, siblingName);
+    
   bubble.innerText = randomTip;
   
   // Highlight bubble
