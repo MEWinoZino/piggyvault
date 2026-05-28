@@ -725,9 +725,9 @@ function triggerPiggyWiggle() {
   bubble.innerText = randomTip;
   
   // Highlight bubble
-  bubble.style.transform = "translateY(-4px) scale(1.05)";
+  bubble.style.transform = "translateX(-50%) translateY(-6px) scale(1.05)";
   setTimeout(() => {
-    bubble.style.transform = "none";
+    bubble.style.transform = "";
   }, 400);
 }
 
